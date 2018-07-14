@@ -1,0 +1,165 @@
+---
+title: "Michelle_Gomez_midterm.Rmd"
+author: "[Michelle Gomez](https://github.com/michelle-gomez/compscix-415-2-assignments)"
+date: "7/8/2018"
+output:
+  pdf_document: default
+  html_document: default
+self_contained: yes
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(mdsr)
+library(tidyverse)
+library (dplyr)
+```
+#The tidyverse packages  
+1. Can you name which package is associated with each task below?
+- Plotting -  `ggplot2 package`
+- Data munging/wrangling -  `dplyr package`
+- Reshaping (speading and gathering) data -  `tidyr package`
+- Importing/exporting data -  `readr package`
+2. Now can you name two functions that you’ve used from each package that you listed above for these tasks?
+- Plotting -  I used `geom_boxplot()` to make box plot graphs of data and `geom_point()` to make scatter plots of the data. Also, functions like `coord_flip()` can be used to flip the axis.
+- Data munging/wrangling -  The pipe operator `%>%` reads left-to-right, plugging in one input to the next via "pipes". Another useful function is `mutate()` because it allows you to create new columns from existing data.
+- Reshaping data -   `gather` allows you to gather columns based on key-value pairs while `spread()` lets you make the data wider by separting keys into columns.
+- Importing/exporting data -  `read_csv()` allows you to load csv files onto R. `write_delim` allows you to export a csv file with a delimeiter of your choosing.  
+
+#R Basics   
+1. Fix this code with the fewest number of changes possible so it works:
+```{r}
+My_data.name___is.too00ooLong <- c( 1 , 2   , 3 )
+My_data.name___is.too00ooLong
+```
+2. Fix this code so it works:  
+```{r}
+my_string <- c('has', 'an', 'error', 'in', 'it')
+my_string
+```
+3. Look at the code below and comment on what happened to the values in the vector:  
+```{r}
+my_vector <- c(1, 2, '3', '4', 5)
+my_vector
+```  
+The values in a vector can either be characters or integers. No matter where you add the single quotations, the output will always be characters with double quotations because R reads it as you're converting the integers to characters.  
+
+#Data import/export  
+1. Download the rail_trail.txt file from Canvas (in the Midterm Exam section) and successfully import it into R. Prove that it was imported successfully by including your import code and taking a glimpse of the result.  
+```{r}
+library(tidyverse)
+file_path <- '/Users/michellegomez/Downloads/rail_trail.txt'
+csv_data <- read_delim(file_path, delim = '|')
+glimpse(csv_data)
+```
+2. Export the file into a comma-separated file and name it “rail_trail.csv”. Make sure you define the path correctly so that you know where it gets saved. Then reload the file. Include your export and import code and take another glimpse.  
+```{r}
+write_delim(csv_data, delim = ',', path = '/Users/michellegomez/Downloads/rail_trail.csv')
+file_path2 <- '/Users/michellegomez/Downloads/rail_trail.csv'
+csv_data2 <- read_csv(file_path2)
+glimpse(csv_data2)
+```
+#Visualization
+1. Critique this graphic: give only three examples of what is wrong with this graphic. Be concise.  
+A few things the graphic did wrong:
+- Used bubbles for comparison of categorical variables instead of a bar graph.
+- Did not incorporate male and female breakdown within each age group category.
+- Because the breakdown is in percentages, they should have done a better job of showing the breakdown as part of a whole like in a stacked bar graph.  
+2. Reproduce this graphic using the diamonds data set.  
+```{r}
+library(ggplot2)
+ggplot(data = diamonds) + 
+  geom_boxplot(mapping = aes(x = cut, y = carat, fill = color), position = "identity") +
+  coord_flip() +
+  xlab("CUT OF DIAMOND") +
+  ylab("CARAT OF DIAMOND")
+
+```
+3. The previous graphic is not very useful. We can make it much more useful by changing one thing about it. Make the change and plot it again.  
+```{r}
+library(ggplot2)
+ggplot(data = diamonds) + 
+  geom_boxplot(mapping = aes(x = cut, y = carat, fill = color), position = "identity") +
+  xlab("CUT OF DIAMOND") +
+  ylab("CARAT OF DIAMOND")
+```
+
+#Data munging and wrangling  
+1. Is this data “tidy”? If yes, leave it alone and go to the next problem. If no, make it tidy. Note: this data set is called table2 and is available in the tidyverse package. It should be ready for you to use after you’ve loaded the tidyverse package.  
+```{r}
+library(dplyr)
+table2 %>%
+    spread(key = type, value = count)
+```
+2. Create a new column in the diamonds data set called price_per_carat that shows the price of each diamond per carat (hint: divide). Only show me the code, not the output.  
+```{r echo=FALSE}
+diamonds %>% 
+  mutate(price_per_carat = price / carat)
+```
+3. For each cut of diamond in the diamonds data set, how many diamonds, and what proportion, have a price > 10000 and a carat < 1.5? There are several ways to get to an answer, but your solution must use the data wrangling verbs from the tidyverse in order to get credit.
+```{r}
+diamonds %>%
+  filter(price > 10000 & carat < 1.5)%>%
+  group_by(price, carat) %>% summarize(count=n())
+```
+
+Do the results make sense? Why?
+Do we need to be wary of any of these numbers? Why? Yes because carata may not be accurate.
+
+#EDA
+1. During what time period is this data from?   
+```{r echo=TRUE}
+txhousing %>%
+  select(year, month, date) %>%
+  arrange(desc(date))
+```
+The date is from October 2013 through August 2015.  
+2. How many cities are represented?  
+```{r}
+txhousing %>% group_by(city) %>% summarize(count=n())
+```
+46 cities are represented.  
+3. Which city, month and year had the highest number of sales?  
+```{r}
+txhousing %>%
+  select(sales, city, month, year) %>%
+  arrange(desc(sales))
+```
+The highest sales were for Houston on August 2015.  
+4. What kind of relationship do you think exists between the number of listings and the number of sales? Check your assumption and show your work.  
+```{r}
+```
+5. What proportion of sales is missing for each city?  
+```{r}
+txhousing %>%
+  filter(is.na(sales)) %>%
+  group_by(city) %>% summarize(count=n()) %>% mutate(proportion = count/187)
+```
+Above you see only cities with missing sales and the proportions of those missing sales to total number of sales. All other cities have a proportion of 0.  
+6. Looking at only the cities and months with greater than 500 sales:
+```{r}
+txhousing %>%
+filter(sales > 500)
+```
+- Are the distributions of the median sales price (column name median), when grouped by city, different? The same? Show your work.  
+```{r width = 30}
+txhousing %>%
+  filter(sales > 500) %>%
+  select(median, city) %>%
+  ggplot(aes(x = city, y = median)) +
+  geom_line()
+```
+The distributions are clearly different as you see in graph above.  
+- Any cities that stand out that you’d want to investigate further?  
+I would like to investigate Collin County (highest median) and Corpus Christi (smallest distribution).
+- Why might we want to filter out all cities and months with sales less than 500?  
+There are many reasons, but I think it's better to filter this way to narrow down on those that sell more to understand why.
+
+#Git and Github  
+
+
+
+
+
+
