@@ -1,0 +1,53 @@
+---
+title: "mm"
+author: "Michelle Gomez"
+date: "7/3/2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(nycflights13)
+library(dplyr)
+
+```
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = y)) +
+  geom_histogram(binwidth = 0.5) +
+  coord_cartesian(ylim = c(0, 50))
+diamonds %>% filter (y>10)
+%>% select(y)
+```
+
+```{r}
+flights %>% sample_n(300) %>%
+summarize(mean_time = mean(air_time, na.rm = TRUE),
+sd_time = sd(air_time, na.rm = TRUE))
+```
+
+```{r}
+ggplot(data = diamonds) +
+geom_boxplot(aes(x = cut, y = price) +
+coordflip()
+```
+```{r}
+?faithful
+glimpse(faithful)
+ggplot(data = faithful) +
+geom_point (aes(y = n, x = time))
+```
+
+```{r, width = 100%}
+
+diamonds <- diamonds %>% mutate(carat_fct = case_when(carat < .5 ~ 'small',
+                                                      carat >= .5 & carat < 1 ~ 'med',
+                                                      carat >= 1 ~ 'large'))
+
+diamonds %>% ggplot(aes(x = cut, y = price)) +
+geom_boxplot() +
+facet_wrap(~carat_fct)
+```
