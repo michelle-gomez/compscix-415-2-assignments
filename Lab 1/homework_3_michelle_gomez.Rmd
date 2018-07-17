@@ -1,0 +1,114 @@
+---
+title: "COMPSCIX 415.2 Homework 3"
+author: "Michelle Gomez"
+date: "6/24/2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r load_packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(mdsr)
+library(tidyverse)
+library(ggplot2)
+library(dbplyr)
+```
+#3.8.1 Exercises  
+1. THe graph can be improved by getting rid of the overplotting. We can plot using geom_jitter to provide a more accurate view of where the data is concentrated by adding random noise to each point.   
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_point()
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_jitter()
+```
+2.  
+According to R help:  
+There are two parameters to adjust the jitter-- width and height.   
+```{r}
+?position_jitter
+```
+3.
+ While geom_jitter() adds random noise to each point to visualize overplotted points, geom_count() lets you see an approximate amount of observations at eahc point my mapping of scaled points.  
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_jitter()
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_count()
+?geom_count()
+```
+4.  
+According to the help sidebar, the default position for geom_boxplot is position_dodge. Also, in the boxplot below, the error says "position_dodge requires non-overlapping x intervals", giving us the position.  
+```{r}
+?geom_boxplot
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy, fill= class)) + 
+  geom_boxplot()
+```
+#3.9.1 Exercises  
+2. What does labs() do? Read the documentation. 
+According to the documentation, labs() helps you set labels to anything from title, axis, legend, to plot names.A neat thing you can do is run all labs in one string ie. labs ( x= "blah", y= "blah", title= "blah).  
+```{r}
+?labs()
+```
+4.   
+The plot below tells be that city and hwy have a positive relationship.  
+coord_fixed seems to change the degree of the line and may be important for visualization purposes.  
+geom_abline() seems to add a reference line or rule to a plot, it's a quick reference to see the line the data could regress to.  
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
+  geom_point() + 
+  geom_abline() +
+  coord_fixed()
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
+  geom_point() + 
+  geom_abline()
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
+  geom_point() + 
+  coord_fixed()
+?geom_abline()
+```
+#Section 4.4  
+1. The "i" is dotless in my_varıable, so the program doesn't understand what we are referring to.  
+```{r}
+#my_variable <- 10
+#my_varıable
+```
+2.  
+```{r}
+library(tidyverse)
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy))
+
+filter(mpg, cyl == 8)
+filter(diamonds, carat > 3)
+```
+#Section 5.2.4:  
+1.  
+```{r}
+library("nycflights13")
+filter(flights, arr_delay > 120)
+filter(flights, dest %in% c("IAH", "HOU"))
+filter(flights, carrier %in% c("AA", "DL", "UA"))
+filter(flights, month >= 7, month <= 9)
+filter(flights, !is.na(dep_delay), dep_delay <= 0, arr_delay > 120)
+filter(flights, !is.na(dep_delay),
+       dep_delay >= 60, dep_delay - arr_delay > 30)
+filter(flights, dep_time <= 600 | dep_time == 2400)
+```
+3.  dep_delay and arr_time are marked as NA so we can deduce that these were flights that never took off, most likely cancelled.  
+```{r}
+filter(flights, is.na(dep_time))
+```
+4.  Any value to the power of 0 is equal to 1, hence why NA ^ 0 is not missing. The expression NA | TRUE, is not missing because the missing value's false/true status doesn't matter.FALSE & "value"will always be false. NA * 0 is NA because multiplying anything times something missing is a missing value.  
+```{r}
+NA * 1
+```
+#5.4.1 Exercises
+```{r}
+select(flights, dep_time, dep_delay, arr_time, arr_delay)
+```
+
+

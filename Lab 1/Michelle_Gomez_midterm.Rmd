@@ -6,15 +6,15 @@ output:
   pdf_document: default
   html_document: default
 self_contained: yes
-
 ---
-
+My Github repository for my assignments can be found at this URL:[(https://github.com/michelle-gomez/compscix-415-2-assignments)] (https://github.com/michelle-gomez/compscix-415-2-assignments)  
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(mdsr)
 library(tidyverse)
 library (dplyr)
 ```
+
 #The tidyverse packages  
 1. Can you name which package is associated with each task below?
 - Plotting -  `ggplot2 package`
@@ -93,19 +93,29 @@ table2 %>%
     spread(key = type, value = count)
 ```
 2. Create a new column in the diamonds data set called price_per_carat that shows the price of each diamond per carat (hint: divide). Only show me the code, not the output.  
-```{r echo=FALSE}
+```{r echo=TRUE, include=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
 diamonds %>% 
   mutate(price_per_carat = price / carat)
 ```
-3. For each cut of diamond in the diamonds data set, how many diamonds, and what proportion, have a price > 10000 and a carat < 1.5? There are several ways to get to an answer, but your solution must use the data wrangling verbs from the tidyverse in order to get credit.
+3. For each cut of diamond in the diamonds data set, how many diamonds, and what proportion, have a price > 10000 and a carat < 1.5? There are several ways to get to an answer, but your solution must use the data wrangling verbs from the tidyverse in order to get credit.  
 ```{r}
-diamonds %>%
+diamonds2 <- diamonds %>% group_by(cut) %>% summarize(count=n())
+
+diamonds3 <- diamonds %>%
   filter(price > 10000 & carat < 1.5)%>%
-  group_by(price, carat) %>% summarize(count=n())
+  group_by(cut) %>% summarize(count=n())
+
+proportion <- diamonds3$count/diamonds2$count
+
+diamonds3 %>% mutate(proportion)
+diamonds2
 ```
 
-Do the results make sense? Why?
-Do we need to be wary of any of these numbers? Why? Yes because carata may not be accurate.
+- Do the results make sense? Why?  
+Yes, because  you expect higher quality of cut if the the price is >10000 for a small amount of carats. 
+
+- Do we need to be wary of any of these numbers? Why?  
+I think we should be wary because the starting count of each count was not equivalent and largely skewed to a better cut, so you will naturally see a higher proportion of better cuts in any filter because of this skewness.  
 
 #EDA
 1. During what time period is this data from?   
@@ -129,7 +139,13 @@ txhousing %>%
 The highest sales were for Houston on August 2015.  
 4. What kind of relationship do you think exists between the number of listings and the number of sales? Check your assumption and show your work.  
 ```{r}
+sales_listings <- txhousing %>%
+  select(listings, sales) %>%
+  arrange_all()
+ggplot(sales_listings)+
+  geom_smooth(aes(x = listings, y = sales), method="loess")
 ```
+There's a positive relationship between listings and sales, the more listings, the more sales.  
 5. What proportion of sales is missing for each city?  
 ```{r}
 txhousing %>%
@@ -157,6 +173,7 @@ I would like to investigate Collin County (highest median) and Corpus Christi (s
 There are many reasons, but I think it's better to filter this way to narrow down on those that sell more to understand why.
 
 #Git and Github  
+see above.
 
 
 
