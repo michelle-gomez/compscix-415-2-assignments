@@ -1,0 +1,88 @@
+---
+title: "COMPSCIX 415.2 Homework 7"
+author: "Michelle Gomez"
+date: "7/18/2018"
+output:
+  pdf_document: default
+  html_document: default
+self_contained: yes
+toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(mdsr)
+library(broom)
+```
+#Exercise 1
+```{r fig.height=10, message=FALSE, warning=FALSE}
+train <- file.path("/Users/michellegomez/Downloads/train.csv")
+train_data <- read_csv(train)
+glimpse(train_data)
+```
+
+#Exercise 2  
+```{r}
+train_data %>%
+  group_by(SalePrice) %>%
+  ggplot() + geom_histogram(aes(x = SalePrice))
+
+train_data %>%
+  select(SalePrice, Neighborhood) %>% arrange_all() %>% ggplot() + geom_boxplot(aes(x = Neighborhood, y = SalePrice)) + coord_flip()
+
+train_data %>%
+  select(SalePrice, OverallQual) %>% arrange_all() %>% ggplot() + geom_smooth(aes(x = OverallQual, y = SalePrice)) + coord_flip()
+
+```
+
+#Exercise 3  
+```{r}
+(sale_lm <- lm(formula = SalePrice ~ OverallQual, data = train_data))
+tidy(sale_lm)
+glance(sale_lm)
+mean(train_data$SalePrice)
+45435.80/180921.2
+```
+- take a look at the coefficient  
+The coefficient is 45435.80 increase in SalePrice by unit increase in OverallQual.  
+- compare the coefficient to the average value of SalePrice  
+The coefficient seems to be 1/4 of the average value of Sale Price.
+- take a look at the R-squared  
+R-squaredis .62, which can be considered a good fit.  
+
+#Exercise 4  
+```{r}
+sale_mult_lm <- lm(formula = SalePrice ~ GrLivArea + OverallQual + Neighborhood, data = train_data)
+sale_mult_lm
+tidy(sale_mult_lm)
+glance(sale_mult_lm)
+```
+
+- How would you interpret the coefficients on GrLivArea and OverallQual?  
+For every one unit increase in GrLivArea, the SalePrice increases, on average, by $55.57.  
+For every one unit increase in OverallQual, the SalePrice increases, on average, by $20951.43.  
+- How would you interpret the coefficient on NeighborhoodBrkSide?  
+The mean SalePrice difference between NeighborhoodBrkSide and Blmngtn is -$13025.45.  
+- Are the features significant?  
+The p-values are all less than alpha=.05 therefore they are all significant prefictors of SalePrice.  
+
+- Are the features practically significant?  
+I don't think that the features are practically siginificant because you can't increase them by a unit, rather they describe a relationship of something measurable like price to some more subjective features.  
+- Is the model a good fit?  
+The model's adjusted R-squared is 0.78, which is closer to 1 so it's more a less a "good" fit but could definitely be better.  
+
+#Exercise 6
+One downside of the linear model is that it is sensitive to unusual values because the distance incorporates a squared term. Fit a linear model to the simulated data below (use y as the target and x as the feature), and look at the resulting coefficients and R-squared. Rerun it about 5-6 times to generate different simulated datasets. What do you notice about the model’s coefficient on x and the R-squared values?  
+```{r}
+sim1a <- tibble(
+x = rep(1:10, each = 3),
+y = x * 1.5 + 6 + rt(length(x), df = 2)
+)
+ggplot(sim1a) + geom_point(aes(x = x, y = y))
+sim1a_lm <- lm(formula = y ~ x , data = sim1a)
+tidy(sim1a_lm)
+glance(sim1a_lm)
+```
+I notice that the R-squared value keeps jumping up and down between .06-.99 and the x coefficient is also variable from 1.0-1.5. I think that the linear model can be improved by weighing outliers less than values that fall within range.
+
+
